@@ -66,13 +66,6 @@ namespace Lab4_1.Models
                 },
                 new City
                 {
-                    CityId= 6,
-                    CityName= "Red Deer",
-                    Population= 1000,
-                    ProvinceCode="AB"
-                },
-                new City
-                {
                     CityId= 7,
                     CityName= "Winnipeg",
                     Population= 120,

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Lab4_1.Data.Migrations
 {
-    public partial class CreateIdentitySchema : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -47,11 +47,23 @@ namespace Lab4_1.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Province",
+                columns: table => new
+                {
+                    ProvinceCode = table.Column<string>(nullable: false),
+                    ProvinceName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Province", x => x.ProvinceCode);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     RoleId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -72,7 +84,7 @@ namespace Lab4_1.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -152,6 +164,54 @@ namespace Lab4_1.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "City",
+                columns: table => new
+                {
+                    CityId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CityName = table.Column<string>(nullable: true),
+                    Population = table.Column<int>(nullable: false),
+                    ProvinceCode = table.Column<string>(nullable: false),
+                    ProvinceCode1 = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_City", x => x.CityId);
+                    table.ForeignKey(
+                        name: "FK_City_Province_ProvinceCode1",
+                        column: x => x.ProvinceCode1,
+                        principalTable: "Province",
+                        principalColumn: "ProvinceCode",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "City",
+                columns: new[] { "CityId", "CityName", "Population", "ProvinceCode", "ProvinceCode1" },
+                values: new object[,]
+                {
+                    { 1, "Vancouver", 400, "BC", null },
+                    { 2, "Surrey", 600, "BC", null },
+                    { 3, "Maple Ridge", 200, "BC", null },
+                    { 4, "Edmonton", 230, "AB", null },
+                    { 5, "Calgary", 800, "AB", null },
+                    { 6, "Red Deer", 1000, "AB", null },
+                    { 7, "Winnipeg", 120, "MB", null },
+                    { 8, "Selkirk", 827, "MB", null },
+                    { 9, "Winkler", 423, "MB", null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Province",
+                columns: new[] { "ProvinceCode", "ProvinceName" },
+                values: new object[,]
+                {
+                    { "BC", "British Columbia" },
+                    { "AB", "Alberta" },
+                    { "MB", "Manitoba" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -161,7 +221,8 @@ namespace Lab4_1.Data.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -187,7 +248,13 @@ namespace Lab4_1.Data.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_City_ProvinceCode1",
+                table: "City",
+                column: "ProvinceCode1");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -208,10 +275,16 @@ namespace Lab4_1.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "City");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Province");
         }
     }
 }
